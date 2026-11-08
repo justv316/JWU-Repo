@@ -5,10 +5,8 @@ def playerTurn():
     # Helper function for handling player input
     aInput = playerInput()
     if aInput == "Hit" or aInput == "hit":
-        #return pScore + hitMe()
         return "hit"
     elif aInput == "Stand" or aInput == "stand":
-        #return pScore
         return "stand"
 
 def playerInput():
@@ -26,7 +24,7 @@ def isaValid(value):
     # Helper function for input validation
     # It may be more ideal to use regex to match valid terms because of pythons case sensitivity.
     validInput = ["Hit","Stand","hit","stand"]
-    # Return the string if it's one of the expected terms
+    # Return valid input to the calling function
     if value in validInput:
         return value
     else:
@@ -39,73 +37,73 @@ def hitMe(value):
 def checkWinner(pScore,cScore):
     # Helper function to determine winner
     print(f"Player Hand: {pScore} Computer Hand: {cScore}")
-    if pScore > 21:
-        print("Computer Win! Player Loss!")
-        return "computer"
-    elif cScore > 21:
+    if pScore > cScore or cScore > 21:
         print("Player Win! Computer Loss!")
         return "player"
-    elif pScore > cScore:
-        print("Player Win! Computer Loss!")
-        return "player"
-    elif pScore < cScore:
+    elif pScore < cScore or pScore > 21:
         print("Computer Win! Player Loss!")
         return "computer"
     elif pScore == cScore:
         print("It's a draw!")
         return None
+    
+def playAgain():
+    # Helper function to request to start the game over
+    print("| Would you like to play again? [Yes or enter to quit] |")
+    bInput = input("| Yes | ")
+    # Return valid input to the calling function
+    if bInput == "Yes":
+        return bInput
+    else:
+        return None
+        # Anything other than an explicit "Yes" will close the game without error
 
+# Conceptually what we want to happen in the loop is to perform hitMe as long as pScore < 21 and the user doesnt want to stand
 def gameRound(gRound,pWins,pLoss):
     # score variables
     pScore = 0
     cScore = 0
     # initialize computer turn boolean as false so we can check for it
     cTurn = False
+    # Bool indicating player has chosen to stand
+    pStand = False
     # Start round
     print(f"| It is round {gRound} |")
     print(f"| Wins: {pWins} |")
     print(f"| Losses: {pLoss} |")
-    pTurn = True
     # pScore starts at 0
     print(f"| Current hand value is {pScore} |")
     # We automatically hit for the player to begin the game proper
     pScore = hitMe(pScore)
-    while pTurn == True:
-        # check score if 21, busted, or fine to continue
-        if pScore >= 21:
-            if pScore == 21:
-                # 21 is an auto-stand
-                print("| You scored 21! |")
-                # End Player Turn
-                pTurn = False
-                # Begin Computer Turn
-                cTurn = True
-                break
-                # The instructions do not state that 21 is an auto-win for the player so we are not treating it as one
-            elif pScore > 21:
-                # Over 21 is an auto-loss
-                print("| You have busted! |")
-                # End Player Turn
-                pTurn = False
-                # Skip Computer Turn
-                break
-        else:
-            print(f"| Current hand value is {pScore} |")
-            # ask player to hit or stand
-            aInput = playerTurn()
+    while pScore < 21 and pStand == False:
+        # perform hitMe so long as these two are true.
+        print(f"| Current hand value is {pScore} |")
+        # ask player to hit or stand
+        aInput = playerTurn()
         if aInput == "hit":
             # produce a new score based on current score and check it for validity
             pScore = hitMe(pScore)
         elif aInput == "stand":
-            # we only ever get here if the score is valid in the first place, so we do not need to call checkScore
-            #pScore = checkScore(pScore)
             # begin Computer Turn
             cTurn = True
             # end Player Turn
-            pTurn = False
+            pStand = True
         else:
             # Loop until we get an 'ending' result (bust, stand)
             print(f"| Current hand value is {pScore} |")
+    # Score is above 21 or the player has stood
+    # Catch "busts" and catch 21
+    if pScore == 21:
+        print("| You scored 21! |")
+        pStand = True
+        cTurn == True
+        # The instructions do not state that 21 is an auto-win for the player so we are not treating it as one
+    elif pScore > 21:
+        # Over 21 is an auto-loss
+        print("| You have busted! |")
+        # End Player Turn
+        pStand = True
+        # Skip Computer Turn
     # Computers turn
     while cTurn == True:
         # Score begins at 0
@@ -120,7 +118,7 @@ def gameRound(gRound,pWins,pLoss):
             cTurn = False
         else:
             cScore = hitMe(cScore)
-    if cTurn == False and pTurn == False:
+    if cTurn == False and pStand == True:
         # both turns have commenced, check score and produce a winner
         winner = checkWinner(pScore,cScore)
         if winner == "player":
@@ -137,17 +135,6 @@ def gameRound(gRound,pWins,pLoss):
             print(f"| Final Score: {gRound} rounds played | ")
             print(f"| Player Wins: {pWins} | Player Losses: {pLoss} |")
             print("Thank y'inz for playing, n'at.")
-    
-def playAgain():
-    # Input request to start the game over
-    print("| Would you like to play again? [Yes or enter to quit] |")
-    bInput = input("| Yes | ")
-    # Return valid input to the calling function
-    if bInput == "Yes":
-        return bInput
-    else:
-        return None
-        # Anything other than an explicit "Yes" will close the game without error
 
 def main():
     # Welcome the player
