@@ -75,7 +75,6 @@ def isaValid(value):
 
 def playAgain():
     # Helper function to request to start the game over
-    print("| Would you like to play again? [Yes or enter to quit] |")
     bInput = input("| Yes | ")
     if bInput == "Yes":
         # Return valid input to the calling function
@@ -86,19 +85,15 @@ def playAgain():
 
 def checkWinner(pScore,cScore):
     # [Objective 12] Print the score for both player and computer then display winner
-    print(f"Player Hand: {pScore} Computer Hand: {cScore}")
     if (pScore > cScore and pScore <= 21) or cScore > 21 :
         # [Objective 9] The player wins when their score is greater than the computers and less than or equal to 21
-        print("Player Win! Computer Loss!")
         return "player"
     elif pScore < cScore or pScore > 21:
         # [Objective 10 & Objective 5] The player loses when the computer score is greater than the players or when player score is greater than 21(bust)
-        print("Computer Win! Player Loss!")
         return "computer"
     elif pScore == cScore:
         # [Objective 11] When both player and computer have the same score the game is tied and no win or loss is recorded
-        print("It's a draw!")
-        return None
+        return "draw"
     
 def gameRound(gRound,pWins,pLoss):
     # Start round
@@ -118,13 +113,19 @@ def gameRound(gRound,pWins,pLoss):
     if pScore <= 21:
         # [Objective 6] After the player goes, the computer gets a turn
         cScore = cTurn(hitMe(0))
+    print(f"Player Hand: {pScore} Computer Hand: {cScore}")
     winner = checkWinner(pScore,cScore)
     if winner == "player":
+        print("Player Win! Computer Loss!")
         pWins = pWins + 1
     elif winner == "computer":
+        print("Computer Win! Player Loss!")
         pLoss = pLoss + 1
+    elif winner == "draw":
+        print("It's a draw!")
     print(f"| Player Wins: {pWins} | Player Losses: {pLoss} |")
     # [Objective 13] ask if player wants to play again
+    print("| Would you like to play again? [Yes or enter to quit] |")
     pAgain = playAgain()
     if pAgain == "Yes":
         # Increment round by 1, pass win and loss count back to the game start
