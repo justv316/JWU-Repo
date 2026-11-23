@@ -23,7 +23,7 @@ def hitMe(value):
     return value + r.randrange(2,12)
 
 def cTurn(cScore):
-    # [Objective 7] Computer will 'stand' 16 or higher so we hit while score is less than 16
+    # [Objective 7] Computer will 'stand' on 16 or higher so we hit while score is less than 16
     while cScore < 16:
         cScore = hitMe(cScore)
         print(f"| Computer score is {cScore} |")
