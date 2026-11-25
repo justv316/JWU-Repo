@@ -1,0 +1,106 @@
+.container{
+    display: flex;
+    padding: 8px;
+    border: 2px solid #ebebeb;
+    margin-right: 4px;
+}
+
+.container div {
+  border: 2px solid #ebebeb;
+  padding: 8px;
+  text-align: center;
+  margin: auto;
+}
+
+iframe {
+    width: 86%;
+    height: 768px;
+    object-fit: cover;
+}
+
+img.auto {
+    border: 2px solid #ebebeb;
+    display: block;
+    margin: auto;
+    margin-bottom: 8px;
+}
+ul.left {
+    text-align: left;
+}
+h1.center {
+    text-align: center;
+    font-size: 3em
+}
+h2.center {
+    text-align: center;
+    font-size: 1.5em
+}
+p.center{
+    text-align: center;
+    font-size: 1em
+}
+p.stress{
+    font-size: 1.5em;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+    width: fit-content;
+}
+
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    align-items: center;
+  }
+}
+
+.column{
+    margin-top: 8px;
+    margin-bottom: 4px;
+    border: 2px solid #ebebeb;
+    padding: 8px;
+    font-size: 20px;
+    height: 774px;
+    float: left;
+    width: 66%;
+}
+.bandcamp{
+    margin-top: 8px;
+    margin-bottom: 4px;
+    margin-right: 4px;
+    margin-left: 2px;
+    border: 2px solid #ebebeb;
+    float: left;
+    width:32.43%;
+    text-align: center;
+    height: fit-content;
+}
+
+.row{
+    margin: 0 auto;
+    width:fit-content;
+}
+
+.row:after{
+    content:"";
+    display:table;
+    clear:both;
+}
+
+body{
+    background-color: #1f1f1f;
+    height: 100vh;
+    width: 100vw;
+    color: #ebebeb;
+    box-sizing: border-box;
+    font-size: 28px;
+}
+
+a.button{
+    height: 32px;
+    width: 32px;
+    padding: 3px 3px;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+}
