@@ -1,3 +1,6 @@
+# Basically what we want to do is have the player input a number from 1 to 9, and then check if that space is available, and then write the players symbol to that space.
+# After each turn, we display the board, and check for winning combination
+
 class GameBoard():
     def __init__(self):
         self.createBoard()
@@ -11,14 +14,14 @@ class GameBoard():
         # This is list comprehension [expression for item in iterable] for item in iterable 
         self.board = [[str(" ") for _ in range(self.cols)] for _ in range(self.rows)]
         # Number each cell 1 through 9
-        # I would really like to figure out how to do this in a one liner or something less expensive
-        # Basically what we want to do is have the player input a number from 1 to 9, and then check if that space is available, and then write the players symbol to that space.
-        # After each turn, we display the board, and check for winning combination
         n = 1
         while n <= 9:
             for row in range(self.rows):
                 for col in range(self.cols):
-                    self.board[row][col] = n
+                    # Input is in string, so we're going to make the entries in the grid strings. 
+                    # We can use isdigit() on a string, but cant on an integer
+                    # there is likely a better way to do this, but this works and its only 9 operations. 
+                    self.board[row][col] = str(n)
                     n = n + 1
             
     def displayBoard(self):
@@ -26,37 +29,67 @@ class GameBoard():
         for row in range(self.rows):
             print(self.board[row][0],"|", self.board[row][1], "|",self.board[row][2])
             if row != 2:
+                # Print a pretty divider between the first and second rows
                 print("--+---+--")
 
     def mapBoard(self):
         # Players will call the numbered cell which correlates to a location in the matrix.
+        # Will modify value in self.board[x][y]
         self.mapped = {
-            "1" : self.board[0][0],
-            "2" : self.board[0][1],
-            "3" : self.board[0][2],
-            "4" : self.board[1][0],
-            "5" : self.board[1][1],
-            "6" : self.board[1][2],
-            "7" : self.board[2][0],
-            "8" : self.board[2][1],
-            "9" : self.board[2][2]
+            "1" : (0,0),
+            "2" : (0,1),
+            "3" : (0,2),
+            "4" : (1,0),
+            "5" : (1,1),
+            "6" : (1,2),
+            "7" : (2,0),
+            "8" : (0,1),
+            "9" : (0,2),
         }
 
+class TheGame():
+    validset = []
+    def __init__(self,board):
+        # Valid selections are the numbers 1-9 as strings. Iterate through the range, converting them to strings, appending them to the valid array
+        for _ in range(1,10): self.validset.append(str(_))
+        self.board = board
+
+    def isValid(self,value):
+        # Helper function to verify players input.
+        # They can only enter a digit and we should not terminate the script if they mistakenly enter something else
+        if value in self.validset:
+            return value
+        else:
+            return None
+
+    def playerInput(self):
+        while True:
+            move = self.isValid(str(input("Enter 1 through 9 >")))
+            if move is not None:
+                return move
+            else: 
+                print('You must enter a value between 1 and 9')
+
     def playerMove(self):
-        move = str(input(f"Enter 1 through 9 >"))
-        if self.mapped.get(move).isdigit() is False:
+        # cell is a tuple containing 2 numbers, the x and y coordinate of the corresponding matrix
+        self.board.displayBoard()
+        cell = self.board.mapped.get(self.playerInput())
+        # Check the board, if it's a digit then it has not been played yet
+        if self.board.board[cell[0]][cell[1]].isdigit() is False:
             # This space has been changed to a player symbol, and is inaccessible
             print("You must select an empty space (Numbered)")
+            self.board.displayBoard()
         else:
-            self.mapped.get(move) = "X"
-
+            # change the referenced cell in the matrix to the players symbol
+            # We change the cell in the board with the active player symbol (NEEDS CHANGED TO SYM VARIALBE ONCE WE GET THERE)
+            self.board.board[cell[0]][cell[1]] = "X"
+            self.board.displayBoard()
 
 def main():
+    # create the board
     board = GameBoard()
-    #board.displayBoard()
-    move = str(input(f"Enter 1 through 9 >"))
-    print(board.mapped.get(move))
+    # create the game with the board
+    game = TheGame(board)
+    # play the game
+    game.playerMove()
 main()
-    # create the game
-    # feed the game into the board
-    # run the main loop
