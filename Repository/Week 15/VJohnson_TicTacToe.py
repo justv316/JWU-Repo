@@ -48,23 +48,59 @@ class GameBoard():
         }
 
 class TheGame():
-    validset = []
     def __init__(self,board):
-        # Valid selections are the numbers 1-9 as strings. Iterate through the range, converting them to strings, appending them to the valid array
-        for _ in range(1,10): self.validset.append(str(_))
+        # make the board a part of the game
         self.board = board
+        # Valid selections are the numbers 1-9 as strings. Iterate through the range, converting them to strings, appending them to the valid array
+        self.validset = []
+        for _ in range(1,10): self.validset.append(str(_))
+        # Create Player 1 and Player 2
+        self.players = {
+            "Player1" : " ",
+            "Player2" : " ",
+        }
+        # Ask Player 1 what Symbol they want, then give player 2 the other symbol.
+        player1sel = self.playerSelectionInput()
+        if player1sel == "X":
+            self.players["Player1"] = "X"
+            self.players["Player2"] = "O"
+        else:
+            self.players["Player1"] = "O"
+            self.players["Player2"] = "X"
+        print(f"{self.players}")
+        # We can now access the players symbol with self.players[player] where player equals "Player1" or "Player2" depending on turn count. 
+        # start at turn 1. Odd turns will be player1, even turns will be player 2. 
 
-    def isValid(self,value):
-        # Helper function to verify players input.
+
+    def isaValid(self,value):
+        # Helper function to verify players input for selecting symbol.
+        # They can only enter a symbol and we should not terminate the script if they mistakenly enter something else
+        if value == "X" or value == "O":
+            return value
+        else:
+            return None
+
+    def isbValid(self,value):
+        # Helper function to verify players input for their turn.
         # They can only enter a digit and we should not terminate the script if they mistakenly enter something else
         if value in self.validset:
             return value
         else:
             return None
 
-    def playerInput(self):
+    def playerSelectionInput(self):
+        # Input loop, checks if the input is valid and prevents the script from breaking on invalid inputs.
         while True:
-            move = self.isValid(str(input("Enter 1 through 9 >")))
+            sym = self.isaValid(str(input("X or O >")))
+            if sym is not None:
+                return sym
+            else:
+                print('You must enter X or O')
+
+    def playerTurnInput(self):
+        # Input loop, checks if the input is valid and prevents the script from breaking on invalid inputs.
+        while True:
+            move = self.isbValid(str(input("Enter 1 through 9 >")))
             if move is not None:
                 return move
             else: 
@@ -73,7 +109,7 @@ class TheGame():
     def playerMove(self):
         # cell is a tuple containing 2 numbers, the x and y coordinate of the corresponding matrix
         self.board.displayBoard()
-        cell = self.board.mapped.get(self.playerInput())
+        cell = self.board.mapped.get(self.playerTurnInput())
         # Check the board, if it's a digit then it has not been played yet
         if self.board.board[cell[0]][cell[1]].isdigit() is False:
             # This space has been changed to a player symbol, and is inaccessible
@@ -91,5 +127,4 @@ def main():
     # create the game with the board
     game = TheGame(board)
     # play the game
-    game.playerMove()
 main()
