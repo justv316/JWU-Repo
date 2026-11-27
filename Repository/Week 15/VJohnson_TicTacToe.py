@@ -1,6 +1,9 @@
 # Basically what we want to do is have the player input a number from 1 to 9, and then check if that space is available, and then write the players symbol to that space.
 # After each turn, we display the board, and check for winning combination
 
+# we use regex for input matching because we want to utilize case-insensitive matching.
+import re
+
 class GameBoard():
     def __init__(self):
         self.createBoard()
@@ -16,6 +19,8 @@ class GameBoard():
         # Number each cell 1 through 9
         n = 1
         while n <= 9:
+            #[[str(n) for _ in range(self.cols)] for _ in range(self.rows)]
+            # This doesnt work because it is iterating through and changing each cell to 1, then each cell to 2, and so on. 
             for row in range(self.rows):
                 for col in range(self.cols):
                     # Input is in string, so we're going to make the entries in the grid strings. 
@@ -60,8 +65,7 @@ class TheGame():
             "Player2" : " ",
         }
         # Ask Player 1 what Symbol they want, then give player 2 the other symbol.
-        player1sel = self.playerSelectionInput()
-        if player1sel == "X":
+        if re.match(r"x",self.playerSelectionInput(),re.IGNORECASE):
             self.players["Player1"] = "X"
             self.players["Player2"] = "O"
         else:
@@ -72,7 +76,8 @@ class TheGame():
     def isaValid(self,value):
         # Helper function to verify players input for selecting symbol.
         # They can only enter a symbol and we should not terminate the script if they mistakenly enter something else
-        if value == "X" or value == "O":
+        res = re.match(r"x|o",value,re.IGNORECASE)
+        if res:
             return value
         else:
             return None
@@ -81,6 +86,14 @@ class TheGame():
         # Helper function to verify players input for their turn.
         # They can only enter a digit and we should not terminate the script if they mistakenly enter something else
         if value in self.validset:
+            return value
+        else:
+            return None
+
+    def iscValid(self,value):
+        # Helper function to verify if players would like to play again
+        res = re.match("yes",value,re.IGNORECASE)
+        if res:
             return value
         else:
             return None
@@ -103,9 +116,18 @@ class TheGame():
             else: 
                 print('You must enter a value between 1 and 9')
 
+    def playAgainInput(self):
+        # Input loop, checks if the input is valid and prevents the script from breaking on invalid inputs.
+        while True:
+            confirm = self.iscValid(str(input("Play again? >")))
+            if confirm is not None:
+                return confirm
+            else: 
+                print('You must enter some variation of yes')
+
     def checkBoard(self):
         # Checks the combinations of coordinates to see if they're all the same symbol. 
-        # If a winner is found, the Symbol will be returned, otherwise, nothing will be returned
+        # If a winner is found, the winning player will be returned, otherwise, nothing will be returned
         # Define the Winning Combinations
         WinningCombinations = [
             # What this is actually doing is sectioning the board into discrete lists of rows, columns and diags, querying the actual board for its contents. 
@@ -119,7 +141,7 @@ class TheGame():
             [self.board.board[0][1],self.board.board[1][1],self.board.board[2][1]],
             [self.board.board[0][2],self.board.board[1][2],self.board.board[2][2]],
             # Diagonals
-            [self.board.board[2][0],self.board.board[1][1],self.board.board[2][2]],
+            [self.board.board[0][0],self.board.board[1][1],self.board.board[2][2]],
             [self.board.board[0][2],self.board.board[1][1],self.board.board[2][0]]
         ]
         # A combination is a list of 3 symbols as they appear on the board
@@ -129,8 +151,6 @@ class TheGame():
         for combination in WinningCombinations:
             # Each element in WinningCombinations is a list, so we need to do this for each one
             # List Comprehension: Iterates through each element in each combination list, returning true if equal to syms[0], then all function returns true if all elements in the list are true.
-            # for sym in syms: ele == sym for ele in combination
-            # self.board = [[str(" ") for _ in range(self.cols)] for _ in range(self.rows)]
             if all(ele == syms[0] for ele in combination) is True:
                 return "p1"
             elif all(ele == syms[1] for ele in combination) is True:
@@ -152,7 +172,6 @@ class TheGame():
             # We change the cell in the board with the active player symbol 
             self.board.board[cell[0]][cell[1]] = sym
 
-
     def gameLoop(self):
         # The main game loop
         # Start on an odd turn (Player 1)
@@ -171,12 +190,14 @@ class TheGame():
             # check the board for a winning configuration
             result = self.checkBoard()
             if result == "p1":
-                # Checkboard returned a symbol
+                # Checkboard returned a winner
                 print(f"Winner is Player 1")
-                break
+                self.board.displayBoard()
+                self.playAgainInput()
             elif result == "p2":
                 print(f"Winner is Player 2")
-                break
+                self.board.displayBoard()
+                self.playAgainInput()
             else:
                 # No winner found, continue the game
                 turn = turn + 1
@@ -184,6 +205,7 @@ class TheGame():
             # 9 turns have commenced without a winner, the game is a draw
             self.board.displayBoard()
             print("No winner found!")
+            self.playAgainInput()
         # Things that can end the game: Player types 'quit', turn is greater than 9, a winning combination is found. 
         # For quitting, we can look for quit in our isvalid functions 
 
