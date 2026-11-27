@@ -43,8 +43,8 @@ class GameBoard():
             "5" : (1,1),
             "6" : (1,2),
             "7" : (2,0),
-            "8" : (0,1),
-            "9" : (0,2),
+            "8" : (2,1),
+            "9" : (2,2),
         }
 
 class TheGame():
@@ -67,10 +67,7 @@ class TheGame():
         else:
             self.players["Player1"] = "O"
             self.players["Player2"] = "X"
-        print(f"{self.players}")
-        # We can now access the players symbol with self.players[player] where player equals "Player1" or "Player2" depending on turn count. 
-        # start at turn 1. Odd turns will be player1, even turns will be player 2. 
-
+        # We can now access the players symbols with self.players[player] where player equals "Player1" or "Player2"
 
     def isaValid(self,value):
         # Helper function to verify players input for selecting symbol.
@@ -106,20 +103,89 @@ class TheGame():
             else: 
                 print('You must enter a value between 1 and 9')
 
-    def playerMove(self):
-        # cell is a tuple containing 2 numbers, the x and y coordinate of the corresponding matrix
+    def checkBoard(self):
+        # Checks the combinations of coordinates to see if they're all the same symbol. 
+        # If a winner is found, the Symbol will be returned, otherwise, nothing will be returned
+        # Define the Winning Combinations
+        WinningCombinations = [
+            # What this is actually doing is sectioning the board into discrete lists of rows, columns and diags, querying the actual board for its contents. 
+            # This is why we do this when we check for winners, we want to overwrite this list with the current configuration every time we check. 
+            # Rows
+            [self.board.board[0][0],self.board.board[0][1],self.board.board[0][2]],
+            [self.board.board[1][0],self.board.board[1][1],self.board.board[1][2]],
+            [self.board.board[2][0],self.board.board[2][1],self.board.board[2][2]],
+            # Columns
+            [self.board.board[0][0],self.board.board[1][0],self.board.board[2][0]],
+            [self.board.board[0][1],self.board.board[1][1],self.board.board[2][1]],
+            [self.board.board[0][2],self.board.board[1][2],self.board.board[2][2]],
+            # Diagonals
+            [self.board.board[2][0],self.board.board[1][1],self.board.board[2][2]],
+            [self.board.board[0][2],self.board.board[1][1],self.board.board[2][0]]
+        ]
+        # A combination is a list of 3 symbols as they appear on the board
+        # Current player symbols are found in self.players
+        # If the returned symbol is sym1, its player 1s victory. This means player 1 can be either X or O.
+        syms = [self.players["Player1"],self.players["Player2"]]
+        for combination in WinningCombinations:
+            # Each element in WinningCombinations is a list, so we need to do this for each one
+            # List Comprehension: Iterates through each element in each combination list, returning true if equal to syms[0], then all function returns true if all elements in the list are true.
+            # for sym in syms: ele == sym for ele in combination
+            # self.board = [[str(" ") for _ in range(self.cols)] for _ in range(self.rows)]
+            if all(ele == syms[0] for ele in combination) is True:
+                return "p1"
+            elif all(ele == syms[1] for ele in combination) is True:
+                return "p2"
+
+    def playerMove(self,sym):
+        # Print the current board at the start of the turn
         self.board.displayBoard()
+        # cell is a tuple containing 2 numbers, the x and y coordinate of the corresponding matrix
         cell = self.board.mapped.get(self.playerTurnInput())
         # Check the board, if it's a digit then it has not been played yet
         if self.board.board[cell[0]][cell[1]].isdigit() is False:
             # This space has been changed to a player symbol, and is inaccessible
             print("You must select an empty space (Numbered)")
+            # Re-print the board
             self.board.displayBoard()
         else:
             # change the referenced cell in the matrix to the players symbol
-            # We change the cell in the board with the active player symbol (NEEDS CHANGED TO SYM VARIALBE ONCE WE GET THERE)
-            self.board.board[cell[0]][cell[1]] = "X"
+            # We change the cell in the board with the active player symbol 
+            self.board.board[cell[0]][cell[1]] = sym
+
+
+    def gameLoop(self):
+        # The main game loop
+        # Start on an odd turn (Player 1)
+        turn = 1
+        # While the game is active
+        while turn <= 9:
+            if turn % 2 == 0:
+                # Player 2 turn
+                print(f"Player 2 ({self.players["Player2"]}) turn")
+                sym = self.players["Player2"]
+            else:
+                # Player 1 turn
+                print(f"Player 1 ({self.players["Player1"]}) turn")
+                sym = self.players["Player1"]
+            self.playerMove(sym)
+            # check the board for a winning configuration
+            result = self.checkBoard()
+            if result == "p1":
+                # Checkboard returned a symbol
+                print(f"Winner is Player 1")
+                break
+            elif result == "p2":
+                print(f"Winner is Player 2")
+                break
+            else:
+                # No winner found, continue the game
+                turn = turn + 1
+        else:
+            # 9 turns have commenced without a winner, the game is a draw
             self.board.displayBoard()
+            print("No winner found!")
+        # Things that can end the game: Player types 'quit', turn is greater than 9, a winning combination is found. 
+        # For quitting, we can look for quit in our isvalid functions 
 
 def main():
     # create the board
@@ -127,4 +193,6 @@ def main():
     # create the game with the board
     game = TheGame(board)
     # play the game
+    game.gameLoop()
+
 main()
