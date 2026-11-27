@@ -1,4 +1,4 @@
-# Basically what we want to do is have the player input a number from 1 to 9, and then check if that space is available, and then write the players symbol to that space.
+﻿# Basically what we want to do is have the player input a number from 1 to 9, and then check if that space is available, and then write the players symbol to that space.
 # After each turn, we display the board, and check for winning combination
 
 # we use regex for input matching because we want to utilize case-insensitive matching.
@@ -31,11 +31,28 @@ class GameBoard():
             
     def displayBoard(self):
         # iterate through the current rows and print the values
+        # Put the board in a nice little box
+        # I prefer to use box drawing characters
+        # https://en.wikipedia.org/wiki/Box-drawing_characters
+        # Resisting the urge to transpose my powershell program that builds boxes, we're just going to do this one manually.
+        # ┌───────────────────────┐
+        # |     ┏━━━┳━━━┳━━━┓     |
+        # |     ┃ 1 ┃ 2 ┃ 3 ┃     | 
+        # |     ┣━━━╋━━━╋━━━┫     |
+        # |     ┃ 4 ┃ 5 ┃ 6 ┃     | 
+        # |     ┣━━━╋━━━╋━━━┫     |
+        # |     ┃ 7 ┃ 8 ┃ 9 ┃     | 
+        # |     ┗━━━┻━━━┻━━━┛     |
+        # └───────────────────────┘
+        print("┌───────────────────────┐")
+        print("│     ┏━━━┳━━━┳━━━┓     │")
         for row in range(self.rows):
-            print(self.board[row][0],"|", self.board[row][1], "|",self.board[row][2])
+            print("│     ┃",self.board[row][0],"┃", self.board[row][1], "┃",self.board[row][2],"┃     │")
             if row != 2:
                 # Print a pretty divider between the first and second rows
-                print("--+---+--")
+                print("│     ┣━━━╋━━━╋━━━┫     │")
+        print("│     ┗━━━┻━━━┻━━━┛     │")
+        print("└───────────────────────┘")
 
     def mapBoard(self):
         # Players will call the numbered cell which correlates to a location in the matrix.
@@ -171,6 +188,22 @@ class TheGame():
             # change the referenced cell in the matrix to the players symbol
             # We change the cell in the board with the active player symbol 
             self.board.board[cell[0]][cell[1]] = sym
+
+    def splashScreen(self):
+        # Display a welcome message, the rules, and prompt to continue before starting the game
+        print("| ---      Welcome to Tic-Tac-Toe!   --- |")
+        print("| ---                                --- |")
+        print("| ---        By Vanessa Johnson      --- |")
+        print("| ---             CS1101             --- |")
+        print("| ---      The rules are simple:     --- |")
+        print("| ---       Players take turns       --- |")
+        print("| ---    choosing available spaces   --- |")
+        print("| --- until either a winner is found --- |")
+        print("| --- or all spaces have been filled --- |")
+        print("| ---                                --- |")
+        print("| ---  You may type quit at any time --- |")
+        print("| ---       to exit the program      --- |")
+        input("| ---      Press enter to begin!     --- |")
 
     def gameLoop(self):
         # The main game loop
